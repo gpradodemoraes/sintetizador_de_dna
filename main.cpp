@@ -1,10 +1,10 @@
-#include <iostream>
+#include "sintetizadorDNA.h"
 #define FMT_HEADER_ONLY
 #include <fmt/core.h>
 
 int main() {
 
-    std::cout << "hello\n";
-    fmt::println("world!");
+    fmt::println("hello");
+    print_memorizacao();
     return 0;
 }
