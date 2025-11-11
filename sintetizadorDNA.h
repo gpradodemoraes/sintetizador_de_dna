@@ -11,3 +11,7 @@ struct sequencia {
 };
 
 void print_memorizacao();
+bool sintetizadorDNA(std::string sequencia_atual,
+    std::string sequencia_final,
+    unsigned int custo_atual,
+    const unsigned int MAX_CUSTO);

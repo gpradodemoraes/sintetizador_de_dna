@@ -3,8 +3,11 @@
 #include <fmt/core.h>
 
 int main() {
-
-    fmt::println("hello");
     print_memorizacao();
+    if (sintetizadorDNA("A", "TATA", 0, 20)) {
+        fmt::println("É possível sintetizar essa sequência.");
+    } else {
+        fmt::println("Não é possível sintetizar essa sequência.");
+    }
     return 0;
 }
