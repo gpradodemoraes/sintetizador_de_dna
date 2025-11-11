@@ -19,6 +19,12 @@ static std::map<std::string, sequencia*> memorizacaoDeCustos = {
     { "TATA:GC", new sequencia{"TATA", "GC", 10} },
 };
 
+static void print_operacao(sequencia_log *l) {
+    if (l != nullptr) {
+        fmt::println("OP: {}", l->operacao);
+        print_operacao(l->parent);
+    }
+}
 void print_memorizacao() {
     for (auto i : memorizacaoDeCustos) {
         fmt::println("{} => [{}=>{} ({})]", i.first,
@@ -30,8 +36,9 @@ void print_memorizacao() {
 
 bool sintetizadorDNA(const std::string* sequencia_atual,
     const std::string* sequencia_final,
-    unsigned int custo_atual,
-    const unsigned int MAX_CUSTO) {
+    const unsigned int custo_atual,
+    const unsigned int MAX_CUSTO,
+    sequencia_log* parent) {
     const auto length = sequencia_atual->length();
 
     // SEQUENCIA ATUAL: ATTT
@@ -46,8 +53,14 @@ bool sintetizadorDNA(const std::string* sequencia_atual,
             try {
                 sequencia* seq = memorizacaoDeCustos.at(key);
                 // existe uma sequência que chega na string final sem ultrapassar os custos. Retornar true
-                if(seq->custo + custo_atual <= MAX_CUSTO)
+                if(seq->custo + custo_atual <= MAX_CUSTO) {
+                    sequencia_log* log = new sequencia_log;
+                    log->parent = parent;
+                    std::string operacao = fmt::format("{} {} => {} ({}/{})", seq->sequenciaInicial, s, seq->sequenciaFinal, seq->custo, custo_atual + seq->custo);
+                    log->operacao = operacao;
+
                     return true;
+                }
             } catch (std::out_of_range& e) {
             }
             // Não tem na memorização AINDA uma sequência que chega na string final.
@@ -63,12 +76,27 @@ bool sintetizadorDNA(const std::string* sequencia_atual,
                     std::string new_sequencia_atual;
                     for (int j = 0; j < i; j++)
                         new_sequencia_atual.push_back((*sequencia_atual)[j]);
-                    new_sequencia_atual.append(s);
+                    new_sequencia_atual.append(pSequencia->sequenciaFinal);
                     for (int j = i + k; j < length; j++)
                         new_sequencia_atual.push_back((*sequencia_atual)[j]);
-                    fmt::println("AFTER TRANSFORMATION: {} {} => {}", *sequencia_atual,s,  new_sequencia_atual);
+                    // ATTT TT => AAT 5/20
+                    std::string operacao = fmt::format("{} {} => {} ({}/{})", *sequencia_atual,s,  new_sequencia_atual, pSequencia->custo, custo_atual + pSequencia->custo);
                     memorizacaoDeCustos.insert( { *sequencia_atual + ":" + new_sequencia_atual,
                         new sequencia{s, new_sequencia_atual, pSequencia->custo }});
+                    if (pSequencia->custo + custo_atual > MAX_CUSTO) {
+                        // Não precisamos seguir adiante!
+                        continue;
+                    }
+                    auto* log = new sequencia_log;
+                    log->parent = parent;
+                    log->operacao = operacao;
+                    if (!sintetizadorDNA(&new_sequencia_atual, sequencia_final, pSequencia->custo + custo_atual, MAX_CUSTO, log)) {
+                        // achamos uma solução! Não precisamos fazer mais nada
+                        // vamos retornar true para encerrar!
+                    } else {
+                        // Não achamos a solução! Vamos continuar tentando opções!
+                    }
+
                 }
 
             }

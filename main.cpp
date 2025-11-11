@@ -10,13 +10,18 @@ static void print_all_substrings(std::string in) {
             fmt::println("{}/{}={}", i,k,in.substr(i, k));
 }
 int main() {
-    print_all_substrings("G");
-    return 0;
-    print_memorizacao();
-    if (sintetizadorDNA("A", "TATA", 0, 20)) {
+    sequencia_log root{};
+    root.parent = nullptr;
+    root.operacao = std::string("INICIO");
+
+    std::string inicial{"A"};
+    std::string final{"TATA"};
+
+    if (sintetizadorDNA(&inicial, &final, 0, 20, &root)) {
         fmt::println("É possível sintetizar essa sequência.");
     } else {
         fmt::println("Não é possível sintetizar essa sequência.");
     }
+    print_memorizacao();
     return 0;
 }
