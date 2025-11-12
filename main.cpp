@@ -22,6 +22,6 @@ int main() {
     } else {
         fmt::println("Não é possível sintetizar essa sequência.");
     }
-    print_memorizacao();
+    //print_memorizacao();
     return 0;
 }
