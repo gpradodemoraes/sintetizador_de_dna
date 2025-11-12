@@ -7,7 +7,7 @@
 #define FMT_HEADER_ONLY
 #include <fmt/core.h>
 
-static std::map<std::string, sequencia*> memorizacaoDeCustos = {
+static std::map<std::string, sequencia*> mutationsMap = {
     { "A", new sequencia{"A","AT", 2} },
     { "G", new sequencia{"G", "GC", 2} },
     { "TT", new sequencia{"TT", "A", 5} },
@@ -23,7 +23,6 @@ static std::map<std::string, sequencia*> memorizacaoDeCustos = {
 static void print_operacao(sequencia_log *l) {
     std::vector<std::string> sequencia;
     if (l == nullptr) return;
-    sequencia.push_back(l->operacao);
 
     for (sequencia_log* log = l; log != nullptr; log = log->parent) {
         sequencia.push_back(log->operacao);
@@ -33,7 +32,7 @@ static void print_operacao(sequencia_log *l) {
         fmt::println("{}) {}", ++counter, *it);
 }
 void print_memorizacao() {
-    for (auto i : memorizacaoDeCustos) {
+    for (auto i : mutationsMap) {
         fmt::println("{} => [{}=>{} ({})]", i.first,
             i.second->sequenciaInicial,
             i.second->sequenciaFinal,
@@ -63,9 +62,9 @@ bool sintetizadorDNA(const std::string* sequencia_atual,
     for (int i = 0; i < length; i++)
         for (int k = 1; k < length - i + 1; k++) {
             std::string original_mutacao = sequencia_atual->substr(i, k);
-            fmt::println("{}/{}={}", i,k,original_mutacao);
+            // fmt::println("{}/{}={}", i,k,original_mutacao);
             try {
-                sequencia* pSeq = memorizacaoDeCustos.at(original_mutacao);
+                sequencia* pSeq = mutationsMap.at(original_mutacao);
                 // existe uma mutação original_mutacao = TT
                 // temos que fazer a substituição de TT na sequencia_atual A(TT)T onde i =1 e k = 2
                 // o resultado final deve ser A(TT)T => A(A)T
@@ -76,15 +75,15 @@ bool sintetizadorDNA(const std::string* sequencia_atual,
                 for (int j = i + k; j < length; j++)
                     seq_depois_mutacao.push_back((*sequencia_atual)[j]);
                 std::string operacao = fmt::format("Sequencia Atual:{}; Mutacao: {}=>{}; Depois: {}({})", *sequencia_atual, original_mutacao, pSeq->sequenciaFinal, seq_depois_mutacao, custo_atual + pSeq->custo);
-                fmt::println("{}", operacao);
+                // fmt::println("{}", operacao);
                 if (custo_atual + pSeq->custo > MAX_CUSTO) {
                     return false;
                 }
-                auto* log = new sequencia_log;
-                log->parent = parent;
-                log->operacao = operacao;
+                sequencia_log log{};
+                log.parent = parent;
+                log.operacao = operacao;
 
-                if (sintetizadorDNA(&seq_depois_mutacao,sequencia_final,custo_atual + pSeq->custo, MAX_CUSTO, log)) {
+                if (sintetizadorDNA(&seq_depois_mutacao,sequencia_final,custo_atual + pSeq->custo, MAX_CUSTO, &log)) {
                     // só vai retornar se for true, ou seja, achou uma solução
                     // se for false deixa ele continuar tentando as outras opções
                     return true;
