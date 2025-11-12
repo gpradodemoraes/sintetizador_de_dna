@@ -49,7 +49,7 @@ bool sintetizadorDNA(const std::string* sequencia_atual,
 
     if (*sequencia_atual == *sequencia_final) {
         print_operacao(parent);
-        fmt::println("Conseguimos metabolizar {}", *sequencia_final);
+        fmt::println("Conseguimos metabolizar {} ao custo de {}", *sequencia_final, custo_atual);
         if (custo_atual > MAX_CUSTO) {
             fmt::println("porém o custo atual {} ultrapassou {}", custo_atual, MAX_CUSTO);
             return false;
